@@ -1,0 +1,85 @@
+<div class="page">
+  <h1 class="page-title">Payment result</h1>
+  <p class="page-sub">Verifying your payment with the server</p>
+
+  <!-- Still verifying -->
+  <mat-card *ngIf="verifying()">
+    <mat-card-content>
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Checking your payment…</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Verified -->
+  <ng-container *ngIf="!verifying() && booking() as b">
+    <mat-card class="mb-16">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>{{ paid ? 'check_circle' : 'schedule' }}</mat-icon>
+        <mat-card-title>
+          {{ paid ? 'Payment received' : 'Payment not completed' }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          Booking {{ b.bookingRef }} · {{ b.parkName }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-chip-listbox>
+          <mat-chip>{{ b.status.replace('_', ' ') }}</mat-chip>
+          <mat-chip *ngIf="b.occasionName">{{ b.occasionEmoji }} {{ b.occasionName }}</mat-chip>
+        </mat-chip-listbox>
+
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>{{ b.slotDate }}</span>
+            <span matListItemLine>{{ b.slotTime }} · visit date &amp; slot</span>
+          </mat-list-item>
+          <mat-list-item *ngFor="let it of b.items">
+            <span matListItemTitle>{{ it.treeEmoji }} {{ it.treeName }} × {{ it.quantity }}</span>
+            <span matListItemLine>{{ it.totalPrice | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item *ngIf="b.amountPaid as amount">
+            <span matListItemTitle>{{ amount | currency:'INR':'symbol' }}</span>
+            <span matListItemLine>Amount</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <a mat-button routerLink="/citizen/bookings">My bookings</a>
+        <a mat-flat-button color="primary" [routerLink]="['/citizen/bookings', b.bookingId]">
+          Open booking
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card *ngIf="!paid">
+      <mat-card-content>
+        <mat-icon>info</mat-icon>
+        The booking is still waiting for payment — you can pay it any time from
+        My Bookings.
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <!-- Verified call failed -->
+  <mat-card *ngIf="!verifying() && error()">
+    <mat-card-content>
+      <mat-icon>error</mat-icon> {{ error() }}
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <a mat-button routerLink="/citizen/bookings">My bookings</a>
+      <a mat-stroked-button routerLink="/citizen/book">Book again</a>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Arrived without a gateway payload -->
+  <mat-card *ngIf="!verifying() && noPayload()">
+    <mat-card-content>
+      <mat-icon>info</mat-icon>
+      No payment response was returned to this page. Open My Bookings to see
+      the current status of your booking, or pay it again from there.
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <a mat-flat-button color="primary" routerLink="/citizen/bookings">My bookings</a>
+    </mat-card-actions>
+  </mat-card>
+</div>

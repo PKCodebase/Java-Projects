@@ -1,0 +1,39 @@
+<div class="page">
+  <h1 class="page-title">My Certificates</h1>
+  <p class="page-sub">Proof of every tree you've planted</p>
+
+  <p *ngIf="loading()" class="muted">Loading certificates…</p>
+
+  <div class="grid grid-3" *ngIf="!loading()">
+    <mat-card *ngFor="let c of certs()" class="cert" [class.invalid]="!c.isValid">
+      <mat-card-content>
+        <div class="top">
+          <span class="emoji">{{ c.treeEmoji || '🌳' }}</span>
+          <span class="badge" [class.ok]="c.isValid" [class.bad]="!c.isValid">
+            {{ c.isValid ? 'VALID' : 'INVALID' }}
+          </span>
+        </div>
+        <h3>{{ c.treeName }}</h3>
+        <dl>
+          <dt>Certificate #</dt><dd>{{ c.certNumber }}</dd>
+          <dt>Park</dt><dd>{{ c.parkName }}</dd>
+          <dt>Planted</dt><dd>{{ c.plantedDate }}</dd>
+          <dt>Tag</dt><dd>{{ c.treeTagId || '—' }}</dd>
+        </dl>
+        <div class="row">
+          <a mat-stroked-button *ngIf="c.pdfUrl" [href]="c.pdfUrl" target="_blank">
+            <mat-icon>download</mat-icon> PDF
+          </a>
+          <a mat-button [routerLink]="['/verify']" [queryParams]="{ cert: c.certNumber }">Verify</a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card *ngIf="!loading() && certs().length === 0">
+    <mat-card-content>
+      <p class="muted">No certificates yet — plant a tree to earn one!</p>
+      <a mat-flat-button color="primary" routerLink="/parks">Browse parks</a>
+    </mat-card-content>
+  </mat-card>
+</div>

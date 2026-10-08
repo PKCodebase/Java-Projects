@@ -1,0 +1,8 @@
+.filter { max-width: 320px; }
+.park { cursor: pointer; transition: transform .15s; }
+.park:hover { transform: translateY(-3px); }
+.head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.head h3 { margin: 0; font-size: 1.05rem; }
+.badge { background: #e8f5e9; color: #2e7d32; font-size: .72rem; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
+.muted { color: rgba(0,0,0,.55); font-size: .85rem; }
+.stats { display: flex; gap: 12px; font-size: .82rem; color: rgba(0,0,0,.65); margin-top: 8px; flex-wrap: wrap; }

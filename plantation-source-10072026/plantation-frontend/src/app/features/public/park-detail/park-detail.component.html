@@ -1,0 +1,82 @@
+<div class="page" *ngIf="park() as p">
+  <div class="head">
+    <div>
+      <h1 class="page-title">{{ p.name }}</h1>
+      <p class="page-sub">{{ p.zone?.name }} · {{ p.address || p.city || 'Delhi' }}</p>
+    </div>
+    <a mat-stroked-button routerLink="/parks">← Back</a>
+  </div>
+
+  <mat-card *ngIf="p.description" class="mb-16">
+    <mat-card-content><p>{{ p.description }}</p></mat-card-content>
+  </mat-card>
+
+  <h2 class="section">1 · Pick a date</h2>
+  <mat-form-field appearance="outline">
+    <mat-label>Visit date</mat-label>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="date"
+           (dateChange)="loadSlots()" [min]="today" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <h2 class="section">2 · Choose a slot</h2>
+  <p *ngIf="loadingSlots()" class="muted">Loading slots…</p>
+  <div class="slots" *ngIf="!loadingSlots()">
+    <div *ngFor="let s of slots()" class="slot"
+         [class.selected]="selectedSlot?.slotId === s.slotId"
+         [class.disabled]="s.status !== 'AVAILABLE' || s.freeSpots === 0"
+         (click)="s.status === 'AVAILABLE' && s.freeSpots > 0 && selectSlot(s)">
+      <b>{{ s.startTime }} – {{ s.endTime }}</b>
+      <span class="muted">{{ s.freeSpots }} / {{ s.capacity }} free</span>
+      <span class="chip" [class.warn]="s.status !== 'AVAILABLE'">{{ s.status }}</span>
+    </div>
+    <p *ngIf="slots().length === 0" class="muted">No slots for this date.</p>
+  </div>
+
+  <ng-container *ngIf="selectedSlot as s">
+    <mat-divider class="mb-16"></mat-divider>
+    <h2 class="section">3 · Select trees</h2>
+
+    <mat-form-field appearance="outline" class="mb-16">
+      <mat-label>Occasion (optional)</mat-label>
+      <mat-select [(ngModel)]="selectedOccasion">
+        <mat-option value="">None</mat-option>
+        <mat-option *ngFor="let o of occasions()" [value]="o.occasionId">
+          {{ o.emojiCode }} {{ o.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="grid grid-3">
+      <mat-card *ngFor="let it of s.inventory" class="tree">
+        <mat-card-content>
+          <div class="tree-head">
+            <span class="emoji">{{ it.emojiCode || '🌳' }}</span>
+            <div>
+              <b>{{ it.commonName }}</b>
+              <div class="muted">{{ it.scientificName }}</div>
+            </div>
+          </div>
+          <div class="tree-foot">
+            <span class="price">₹{{ it.price }}</span>
+            <span class="muted">{{ it.availableQty }} left</span>
+            <div class="stepper">
+              <button mat-icon-button (click)="dec(it)">−</button>
+              <span>{{ count(it.speciesId) }}</span>
+              <button mat-icon-button (click)="inc(it)">+</button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="booking-bar">
+      <span>{{ totalItems() }} tree(s) selected</span>
+      <button mat-flat-button color="primary" [disabled]="totalItems() === 0 || booking()"
+              (click)="book()">
+        {{ booking() ? 'Booking…' : 'Book slot' }}
+      </button>
+    </div>
+  </ng-container>
+</div>

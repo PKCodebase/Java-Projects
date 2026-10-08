@@ -1,0 +1,5 @@
+.set-box { padding: 16px; }
+.set-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.set-row mat-form-field { flex: 1; min-width: 200px; }
+.emoji { font-size: 1.4rem; }
+.muted { color: rgba(0,0,0,.5); padding: 16px; }

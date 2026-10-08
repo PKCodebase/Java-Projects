@@ -1,0 +1,15 @@
+.hero { background: linear-gradient(120deg, #2e7d32, #66bb6a); color: #fff; padding: 72px 24px; text-align: center; }
+.hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 12px; }
+.hero p { font-size: 1.1rem; max-width: 560px; margin: 0 auto 24px; opacity: .95; }
+.cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta a { color: inherit; }
+.section-title { margin: 40px 0 20px; font-size: 1.35rem; }
+.feature mat-card-content { text-align: center; padding: 20px; }
+.icon { width: 56px; height: 56px; border-radius: 50%; background: #e8f5e9; display: grid; place-items: center; margin: 0 auto 12px; }
+.icon mat-icon { color: #2e7d32; font-size: 28px; width: 28px; height: 28px; }
+.feature h3 { font-size: 1rem; margin: 0 0 6px; }
+.feature p { font-size: .85rem; color: rgba(0,0,0,.6); margin: 0; }
+.park { cursor: pointer; transition: transform .15s; }
+.park:hover { transform: translateY(-3px); }
+.park h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.muted { color: rgba(0,0,0,.55); font-size: .85rem; }

@@ -1,0 +1,4 @@
+.muted { color: rgba(0,0,0,.5); padding: 16px; }
+.chip { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: .74rem; padding: 2px 8px; border-radius: 10px; margin: 2px 4px 2px 0; }
+.cert { color: #1565c0; font-weight: 600; text-decoration: none; }
+.cert:hover { text-decoration: underline; }

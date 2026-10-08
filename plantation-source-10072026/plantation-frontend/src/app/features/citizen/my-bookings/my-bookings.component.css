@@ -1,0 +1,11 @@
+.head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.muted { color: rgba(0,0,0,.5); font-size: .78rem; }
+.chip { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: .74rem; padding: 2px 8px; border-radius: 10px; margin: 2px 4px 2px 0; }
+.pill { padding: 3px 10px; border-radius: 12px; font-size: .72rem; font-weight: 700; background: #eee; color: #555; white-space: nowrap; }
+.st-pending-payment { background: #fff3e0; color: #e65100; }
+.st-paid { background: #e3f2fd; color: #1565c0; }
+.st-scheduled { background: #e8eaf6; color: #303f9f; }
+.st-waiting { background: #f3e5f5; color: #6a1b9a; }
+.st-planted { background: #e0f2f1; color: #00695c; }
+.st-completed { background: #e8f5e9; color: #2e7d32; }
+.st-cancelled { background: #ffebee; color: #c62828; }

@@ -1,0 +1,16 @@
+build:
+  id: ${ID}
+  version: ${VERSION}
+  name: ${NAME}
+  type: "Default Build"
+  
+  
+  
+  
+  
+Step 1 :
+Go to intelij
+
+Edit configuration
+
+Modify Option & set environment variable 

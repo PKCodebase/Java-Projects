@@ -1,0 +1,4 @@
+.ctx { color: rgba(0,0,0,.55); font-size: .85rem; }
+.form { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; min-width: 420px; }
+.row { display: flex; gap: 12px; }
+.row mat-form-field { flex: 1; }

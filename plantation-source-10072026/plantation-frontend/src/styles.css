@@ -1,0 +1,40 @@
+/* ══════════════════════════════════════════════════════════════
+   Global styles shared across every feature (NOT view-encapsulated)
+   ══════════════════════════════════════════════════════════════ */
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ── Page scaffolding ─────────────────────────────────────────── */
+.page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.page-title { font-size: 1.6rem; font-weight: 600; margin: 0 0 4px; }
+.page-sub { color: rgba(0, 0, 0, 0.6); margin: 0 0 24px; }
+.toolbar-spacer { flex: 1 1 auto; }
+
+/* ── Cards & grids ────────────────────────────────────────────── */
+.stat-card { text-align: center; padding: 16px; }
+.stat-card .value { font-size: 2.1rem; font-weight: 600; line-height: 1.1; }
+.stat-card .label { color: rgba(0,0,0,.6); font-size: .85rem; margin-top: 4px; }
+
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+.full-width { width: 100%; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* ── Utility pills ────────────────────────────────────────────── */
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 600;
+  background: #eee;
+  color: #666;
+}

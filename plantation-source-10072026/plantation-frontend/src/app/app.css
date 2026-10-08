@@ -1,0 +1,2 @@
+/* Component-scoped root styles (child features rely on src/styles.css
+   for shared .page / .grid helpers — this file is view-encapsulated). */

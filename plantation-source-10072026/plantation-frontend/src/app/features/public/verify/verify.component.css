@@ -1,0 +1,11 @@
+.narrow { max-width: 640px; }
+.verify-form { display: flex; gap: 12px; align-items: center; padding-top: 8px; }
+.verify-form mat-form-field { flex: 1; }
+.result { margin-top: 20px; border-left: 5px solid #2e7d32; }
+.result.invalid { border-left-color: #c62828; }
+.verdict { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; margin-bottom: 12px; }
+.valid .verdict mat-icon { color: #2e7d32; }
+.invalid .verdict mat-icon { color: #c62828; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; }
+dt { color: rgba(0,0,0,.55); font-size: .85rem; }
+dd { margin: 0; font-weight: 500; }

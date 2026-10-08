@@ -1,0 +1,12 @@
+2026-07-13 16:25:10,169 [Worker-5: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is not available. Remote download required.
+2026-07-13 16:25:24,331 [pool-8-thread-3] INFO  org.eclipse.jetty.server.Server - jetty-12.1.10; built: 2026-05-31T04:45:52.925Z; git: 986024525891c2c20ff08c58ba300dc3b9847586; jvm 25.0.1+8-LTS
+2026-07-13 16:25:24,331 [pool-8-thread-4] INFO  org.eclipse.jetty.server.Server - jetty-12.1.10; built: 2026-05-31T04:45:52.925Z; git: 986024525891c2c20ff08c58ba300dc3b9847586; jvm 25.0.1+8-LTS
+2026-07-13 16:25:24,341 [pool-8-thread-3] INFO  o.e.j.server.handler.ContextHandler - Started oejsh.ContextHandler@1d30b5da{ROOT,/,b=null,a=AVAILABLE,vh=[127.0.0.1],h=sateau.WebviewAssetServer$StaticFileHandler@5c5722dd{STARTED}}
+2026-07-13 16:25:24,341 [pool-8-thread-4] INFO  o.e.j.server.handler.ContextHandler - Started oejsh.ContextHandler@122ad616{ROOT,/,b=null,a=AVAILABLE,vh=[127.0.0.1],h=sateau.WebviewAssetServer$StaticFileHandler@1e35f27a{STARTED}}
+2026-07-13 16:25:24,358 [pool-8-thread-3] INFO  o.e.jetty.server.AbstractConnector - Started oejs.ServerConnector@126e5d3b{HTTP/1.1, (http/1.1)}{0.0.0.0:49854}
+2026-07-13 16:25:24,358 [pool-8-thread-4] INFO  o.e.jetty.server.AbstractConnector - Started oejs.ServerConnector@60498df0{HTTP/1.1, (http/1.1)}{0.0.0.0:49853}
+2026-07-13 16:25:24,359 [pool-8-thread-3] INFO  org.eclipse.jetty.server.Server - Started oejs.Server@5772e853{STARTING}[12.1.10,sto=0] @32ms
+2026-07-13 16:25:24,359 [pool-8-thread-4] INFO  org.eclipse.jetty.server.Server - Started oejs.Server@5f445379{STARTING}[12.1.10,sto=0] @32ms
+2026-07-13 16:36:44,954 [Worker-5: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2026-07-13 16:44:12,932 [Worker-1: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2026-07-13 16:46:39,829 [Worker-5: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.

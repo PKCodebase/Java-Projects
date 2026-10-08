@@ -1,0 +1,124 @@
+<div class="page">
+  <h1 class="page-title">Test payment gateway</h1>
+  <p class="page-sub">A local stand-in for the MCD gateway — no real money moves here.</p>
+
+  <!-- What this page is -->
+  <mat-card appearance="outlined" class="mb-16">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>science</mat-icon>
+      <mat-card-title>TEST MODE</mat-card-title>
+      <mat-card-subtitle>Served only while the backend runs with PG_TEST_MODE=true</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-chip-listbox>
+        <mat-chip>PG_TEST_MODE=true</mat-chip>
+        <mat-chip>no real payment</mat-chip>
+      </mat-chip-listbox>
+      <p>
+        The buttons below mint a clearly-labelled fake gateway response that the
+        <strong>real</strong> payment-verification endpoint consumes, so success and
+        failure are what the server actually decides — this tests the production path.
+      </p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <mat-card *ngIf="loading()" class="mb-16">
+    <mat-card-content>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p>Loading the booking…</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Could not load / backend refused -->
+  <mat-card *ngIf="!loading() && error()" appearance="outlined" class="mb-16">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>error</mat-icon>
+      <mat-card-title>Test gateway unavailable</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ error() }}</p>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <a mat-button routerLink="/citizen/bookings">My bookings</a>
+    </mat-card-actions>
+  </mat-card>
+
+  <ng-container *ngIf="!loading() && booking() as b">
+    <!-- The booking waiting for payment -->
+    <mat-card appearance="outlined" class="mb-16">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>receipt_long</mat-icon>
+        <mat-card-title>Booking {{ b.bookingRef }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ b.parkName }}<ng-container *ngIf="b.slotDate"> · {{ b.slotDate }} {{ b.slotTime }}</ng-container>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngFor="let it of b.items">
+            <span matListItemTitle>{{ it.treeEmoji }} {{ it.treeName }} × {{ it.quantity }}</span>
+            <span matListItemLine>{{ it.totalPrice | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item>
+            <span matListItemTitle>
+              {{ (b.paymentOrder?.totalAmount ?? b.amountPaid ?? 0) | currency:'INR':'symbol' }}
+            </span>
+            <span matListItemLine>Total payable</span>
+          </mat-list-item>
+          <mat-list-item>
+            <span matListItemTitle>{{ b.status.replace('_', ' ') }}</span>
+            <span matListItemLine>Current status</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <a mat-button routerLink="/citizen/bookings">
+          <mat-icon>arrow_back</mat-icon> Back to My Bookings
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- The two fake gateway outcomes -->
+    <div class="grid grid-2 mb-16">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>check_circle</mat-icon>
+          <mat-card-title>Successful payment</mat-card-title>
+          <mat-card-subtitle>Gateway code 000 — the booking should become PAID</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Runs the real verification with a success response and shows the server's verdict.</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" [disabled]="busy()" (click)="pay('success')">
+            <mat-icon>check_circle</mat-icon> Simulate success
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>cancel</mat-icon>
+          <mat-card-title>Failed payment</mat-card-title>
+          <mat-card-subtitle>Gateway code 102 — the booking stays awaiting payment</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Runs the real verification with a failure response — the booking must not become paid.</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-stroked-button color="warn" [disabled]="busy()" (click)="pay('failure')">
+            <mat-icon>cancel</mat-icon> Simulate failure
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <mat-card *ngIf="busy()" class="mb-16">
+      <mat-card-content>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Contacting the verification endpoint…</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

@@ -1,0 +1,10 @@
+.topbar { position: sticky; top: 0; z-index: 10; gap: 8px; }
+.brand { text-decoration: none; color: #fff; font-weight: 600; font-size: 1.1rem; }
+.nav-links { display: flex; gap: 2px; }
+.nav-links a.active { background: rgba(255,255,255,.15); }
+.content { min-height: calc(100vh - 128px); }
+.footer { background: #1b2a1b; color: #cfe3cf; text-align: center; padding: 20px; font-size: .85rem; }
+@media (max-width: 760px) {
+  .nav-links { display: none; }
+  .hide-sm { display: none; }
+}

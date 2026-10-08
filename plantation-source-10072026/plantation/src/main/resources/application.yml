@@ -1,0 +1,188 @@
+spring:
+  application:
+    name: mcd-plantation-portal
+
+  # ── Secrets ─────────────────────────────────────────────────────────────
+  # No secret is stored in this file. They are read from, in order:
+  #   1. real environment variables (highest precedence - use these in prod/CI)
+  #   2. %USERPROFILE%/.plantation/backend.properties   (local dev, git-ignored
+  #      because it lives OUTSIDE the source tree)
+  #   3. ./.env.properties next to where the app is started (optional)
+  # Both files are OPTIONAL: if neither the file nor the env vars exist the
+  # app fails fast with "Could not resolve placeholder <KEY>" instead of
+  # silently starting with a default credential.
+  config:
+    import:
+      - optional:file:${user.home}/.plantation/backend.properties
+      - optional:file:${user.dir}/.env.properties
+
+  datasource:
+#    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:plantation}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:plantation}
+
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+# EMAIL DISABLED — jab enable karna ho tab neeche wala uncomment karo
+# Credentials come ONLY from environment variables — never hardcode them.
+#  mail:
+#    host: ${MAIL_HOST:smtp.gmail.com}
+#    port: ${MAIL_PORT:587}
+#    username: ${MAIL_USER}
+#    password: ${MAIL_PASS}
+#    properties:
+#      mail.smtp.auth: true
+#      mail.smtp.starttls.enable: true
+
+  cache:
+    type: simple
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /plantation
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html
+
+# Secrets come ONLY from environment variables — no hardcoded keys.
+# Required: JWT_SIGN_KEY, JWT_ENCRYPT_KEY  (64-char hex each)
+# Optional: JWT_ACCESS_EXPIRY_MS (default 1 h), JWT_REFRESH_EXPIRY_MS (default 7 d)
+jwt:
+  signKey: ${JWT_SIGN_KEY}
+  encryptdecryptkey: ${JWT_ENCRYPT_KEY}
+  access-expiry-ms: ${JWT_ACCESS_EXPIRY_MS:3600000}
+  refresh-expiry-ms: ${JWT_REFRESH_EXPIRY_MS:604800000}
+
+razorpay:
+  # Supply RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET as environment variables when
+  # live payments are enabled (RAZORPAY_DEV_MODE=false). Empty by default —
+  # dev-mode never calls the gateway, and no key is ever hardcoded here.
+  key-id: ${RAZORPAY_KEY_ID:}
+  key-secret: ${RAZORPAY_KEY_SECRET:}
+  currency: INR
+  gst-rate: 0.18
+  processing-fee: 50.00
+  dev-mode: ${RAZORPAY_DEV_MODE:true}
+
+# Google sign-in (OAuth2). The client id is a PUBLIC identifier — it is meant
+# to ship in the browser — so it is not a secret, but it is never hardcoded
+# here either: it comes from the environment.
+#   REQUIRED to enable Google sign-in:  GOOGLE_CLIENT_ID
+#   (OAuth2 "Web application" client id from the Google Cloud console, the same
+#    one configured as an authorised JavaScript origin for the Angular app).
+# Left unset → POST /auth/oauth2/google answers 501 and the UI shows that
+# Google sign-in is not configured instead of pretending to work.
+oauth2:
+  google-client-id: ${GOOGLE_CLIENT_ID:}
+
+storage:
+  #upload-dir: ${UPLOAD_DIR:C:/Projects/mcd-uploads}
+  upload-dir: ${UPLOAD_DIR:D:/plantation_doc}
+  base-url: ${STORAGE_BASE_URL:http://localhost:8080/plantation/uploads}
+
+mcd:
+  certificate:
+    issuer: "Municipal Corporation of Delhi"
+    department: "Horticulture Department"
+    city: "New Delhi"
+  booking:
+    cancellation-hours: 48
+    payment-expiry-minutes: 30
+  inventory:
+    low-stock-threshold: 3
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+  info:
+    title: MCD Green Plantation Portal API
+    version: 2.0.0
+    description: REST API for MCD Green Plantation Portal with slot-level tree inventory
+
+logging:
+  level:
+    com.mcd.plantation: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    
+rolecode:
+  plantation:
+    admin: R_HORTIC_ADM
+    horticultre-admin: R_HORTIC_OFF
+    supervisor: SUPERVISOR
+  
+  
+  
+pg:
+  initiate-url: https://mcdonline.nic.in/paymcdbeta/mcd/tokenFinDetail
+  callback-url: https://stag.mcdonline.nic.in/swagamPaymentCallback
+  cancel-url: https://stag.mcdonline.nic.in/swagamPaymentCallback
+  # Optional overrides for where the gateway sends the citizen back after
+  # paying. Blank by default, so the staging callback above is unchanged.
+  # Set PG_RETURN_URL to land the citizen in the Angular app instead, e.g.
+  # http://localhost:4200/citizen/payment/result
+  return-url: ${PG_RETURN_URL:}
+  cancel-return-url: ${PG_CANCEL_URL:}
+  # TEST-ONLY local fake gateway. OFF by default — never enable in production.
+  # With PG_TEST_MODE=true:
+  #   * /bookings/{id}/payment/init hands back the local test page below
+  #     (frontend-base-url + /citizen/payment/test) instead of the real
+  #     MCD gateway URL, so no real payment is ever attempted;
+  #   * POST /bookings/{id}/payment/test-payload mints a clearly-labelled
+  #     fake gateway response (Base64 JSON, txnResponseCode 000/102) that the
+  #     REAL /bookings/payment/verify endpoint consumes, so the production
+  #     verify path is what gets exercised end to end.
+  # With the flag off the test-payload endpoint answers 404 (not a usable
+  # API) and payment/init behaves exactly as before.
+  test-mode: ${PG_TEST_MODE:false}
+  frontend-base-url: ${PG_FRONTEND_BASE_URL:http://localhost:4200}
+  # Payment-gateway payload encryption key. REQUIRED env var: PG_AES_KEY
+  # (AES-128/192/256 => 16/24/32 characters). Never hardcode it here.
+  aes-key: ${PG_AES_KEY}
+  request-type: APP
+  app-code: TREE
+  server-loacal-flag: S
+
+swagam:
+  api-base-url: https://stag.mcdonline.nic.in/swagamservice
+  pdf-generation-url: https://stag.mcdonline.nic.in/pdfservice/api/reports/generate  
+
+certificate:
+  service:
+    url: "https://stag.mcdonline.nic.in/pdfservice/api/reports/generate"

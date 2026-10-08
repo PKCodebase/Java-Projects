@@ -1,0 +1,180 @@
+<div class="page">
+  <div class="head">
+    <div>
+      <h1 class="page-title">Officer Dashboard</h1>
+      <p class="page-sub">
+        <b>{{ user?.fullName || 'Officer' }}</b> · {{ roleLabel }}
+        <span *ngIf="parks().length > 0">
+          · {{ parks().length }} park(s)<span *ngIf="zones().length"> · {{ zones().join(', ') }}</span>
+        </span>
+      </p>
+    </div>
+    <div class="actions">
+      <a mat-flat-button color="primary" routerLink="/officer/pending">Open work queue</a>
+      <a mat-stroked-button routerLink="/officer/slots">Manage slots</a>
+    </div>
+  </div>
+
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()" class="muted">Loading your parks and work queue…</p>
+
+  <ng-container *ngIf="!loading()">
+    <!-- KPIs — all scoped to this officer's assignments -->
+    <div class="grid grid-4">
+      <mat-card class="kpi green"><mat-card-content>
+        <mat-icon>park</mat-icon><div class="num">{{ parks().length }}</div>
+        <div class="lbl">My parks</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi amber"><mat-card-content>
+        <mat-icon>pending_actions</mat-icon><div class="num">{{ pending().length }}</div>
+        <div class="lbl">Pending work</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi blue"><mat-card-content>
+        <mat-icon>today</mat-icon><div class="num">{{ today().length }}</div>
+        <div class="lbl">Due today</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi purple"><mat-card-content>
+        <mat-icon>social_facilitation</mat-icon><div class="num">{{ treesToPlant() }}</div>
+        <div class="lbl">Trees to plant</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi green"><mat-card-content>
+        <mat-icon>check_circle</mat-icon><div class="num">{{ completed().length }}</div>
+        <div class="lbl">Plantations recorded</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi red"><mat-card-content>
+        <mat-icon>report</mat-icon><div class="num">{{ lowStock().length }}</div>
+        <div class="lbl">Low stock alerts</div>
+      </mat-card-content></mat-card>
+    </div>
+
+    <!-- Not-assigned explainer -->
+    <mat-card *ngIf="noScope()" class="notice">
+      <mat-card-content>
+        <mat-icon>info</mat-icon>
+        <div>
+          <b>No parks are assigned to you yet.</b>
+          <div class="muted">
+            Pending work, slots and low-stock alerts are all scoped to your park
+            assignments, so they will stay empty until an admin assigns parks to
+            your account from <i>Admin → Assignments</i>.
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="two-col mt-16">
+      <!-- Pending plantation work -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Pending plantation work</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row-item" *ngFor="let b of pendingSorted().slice(0, 8)">
+            <div>
+              <b>{{ b.parkName || 'Park' }}</b>
+              <div class="muted">
+                {{ b.bookingRef }} · {{ b.citizenName || 'Citizen' }}
+                <span *ngIf="b.slotDate"> · {{ b.slotDate | date:'mediumDate' }}</span>
+                <span *ngIf="b.slotTime"> · {{ b.slotTime }}</span>
+                · {{ treeCount(b) }} tree(s)
+              </div>
+            </div>
+            <div class="right">
+              <span class="pill" [ngClass]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+              <a mat-button routerLink="/officer/pending">Open</a>
+            </div>
+          </div>
+
+          <p *ngIf="pendingSorted().length === 0 && !noScope()" class="muted">
+            🎉 Nothing pending in your parks — all plantation work is up to date.
+          </p>
+          <a *ngIf="pending().length > 8" mat-button routerLink="/officer/pending">
+            View all {{ pending().length }} →
+          </a>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- My parks -->
+      <mat-card>
+        <mat-card-header><mat-card-title>My parks</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <div class="row-item" *ngFor="let p of parks().slice(0, 8)">
+            <div>
+              <b>{{ p.name }}</b>
+              <div class="muted">
+                <span *ngIf="p.zone">{{ p.zone.name }}</span>
+                <span *ngIf="p.address"> · {{ p.address }}</span>
+              </div>
+            </div>
+            <span class="pill" [class.off]="!p.isActive">
+              {{ p.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <p *ngIf="parks().length === 0" class="muted">No parks assigned.</p>
+          <a *ngIf="parks().length > 8" mat-button routerLink="/officer/slots">
+            Manage slots for all {{ parks().length }} parks →
+          </a>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="two-col mt-16">
+      <!-- Low stock -->
+      <mat-card>
+        <mat-card-header><mat-card-title>Low stock alerts</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <div class="row-item" *ngFor="let a of lowStock().slice(0, 6)">
+            <div>
+              <b>{{ a.treeEmoji }} {{ a.treeName }}</b>
+              <div class="muted">{{ a.parkName }} · slot {{ a.slotDate | date:'mediumDate' }}</div>
+            </div>
+            <span class="pill st-warning">{{ a.availableQty }} left</span>
+          </div>
+          <p *ngIf="lowStock().length === 0" class="muted">
+            All stock levels are healthy for your parks.
+          </p>
+          <a *ngIf="lowStock().length > 6" mat-button routerLink="/officer/low-stock">
+            View all {{ lowStock().length }} →
+          </a>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Recently completed -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            Recently completed
+            <span class="muted" *ngIf="completedThisMonth().length">
+              · {{ completedThisMonth().length }} this month
+            </span>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row-item" *ngFor="let c of recentCompleted()">
+            <div>
+              <b>{{ c.citizenName || 'Citizen' }}</b>
+              <div class="muted">
+                {{ c.parkName }} · {{ (c.plantedDate || c.slotDate) | date:'mediumDate' }}
+                <span *ngIf="c.certNumber"> · {{ c.certNumber }}</span>
+              </div>
+            </div>
+            <span class="pill st-completed">Recorded</span>
+          </div>
+
+          <p *ngIf="completed().length === 0" class="muted">
+            No plantation recorded yet — completed work will appear here.
+          </p>
+          <a *ngIf="completed().length > 6" mat-button routerLink="/officer/completed">
+            View all {{ completed().length }} →
+          </a>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </ng-container>
+</div>

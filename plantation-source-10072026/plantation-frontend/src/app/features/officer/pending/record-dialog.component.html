@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>Record plantation</h2>
+<mat-dialog-content>
+  <p class="ctx">{{ data.booking.bookingRef }} · {{ data.booking.citizenName }} · {{ data.booking.parkName }}</p>
+  <form [formGroup]="form" class="form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tree tag ID</mat-label>
+      <input matInput formControlName="treeTagId" />
+      <mat-error>Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Photo URL (optional)</mat-label>
+      <input matInput formControlName="photoUrl" />
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Latitude</mat-label>
+        <input matInput type="number" formControlName="gpsLat" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Longitude</mat-label>
+        <input matInput type="number" formControlName="gpsLng" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Planted date</mat-label>
+      <input matInput [matDatepicker]="dp" formControlName="plantedDate" />
+      <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+      <mat-datepicker #dp></mat-datepicker>
+      <mat-error>Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput rows="2" formControlName="notes"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="saving()">
+    {{ saving() ? 'Saving…' : 'Record' }}
+  </button>
+</mat-dialog-actions>

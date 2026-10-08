@@ -1,0 +1,134 @@
+<div class="page">
+  <div class="head">
+    <div>
+      <h1 class="page-title">Namaste, {{ firstName() }}</h1>
+      <p class="page-sub">Your plantation journey at a glance</p>
+    </div>
+    <div class="actions">
+      <a mat-flat-button color="primary" routerLink="/citizen/book">Book a slot</a>
+      <a mat-stroked-button routerLink="/citizen/certificates">My certificates</a>
+    </div>
+  </div>
+
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()" class="muted">Loading your bookings…</p>
+
+  <ng-container *ngIf="!loading()">
+    <!-- KPIs -->
+    <div class="grid grid-4">
+      <mat-card class="kpi blue"><mat-card-content>
+        <mat-icon>event</mat-icon>
+        <div class="num">{{ total() }}</div>
+        <div class="lbl">My bookings</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi amber"><mat-card-content>
+        <mat-icon>upcoming</mat-icon>
+        <div class="num">{{ upcoming().length }}</div>
+        <div class="lbl">Upcoming slots</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi green"><mat-card-content>
+        <mat-icon>park</mat-icon>
+        <div class="num">{{ treesPlanted() }}</div>
+        <div class="lbl">Trees planted by you</div>
+      </mat-card-content></mat-card>
+
+      <mat-card class="kpi purple"><mat-card-content>
+        <mat-icon>workspace_premium</mat-icon>
+        <div class="num">{{ certCount() }}</div>
+        <div class="lbl">Certificates earned</div>
+      </mat-card-content></mat-card>
+    </div>
+
+    <!-- Empty state -->
+    <mat-card *ngIf="total() === 0" class="empty">
+      <mat-card-content>
+        <mat-icon>energy_savings_leaf</mat-icon>
+        <h2>No bookings yet</h2>
+        <p class="muted">
+          Pick a park, choose a slot and plant your first tree — a digital
+          certificate is issued for every plantation.
+        </p>
+        <a mat-flat-button color="primary" routerLink="/citizen/book">Start a booking</a>
+      </mat-card-content>
+    </mat-card>
+
+    <ng-container *ngIf="total() > 0">
+      <!-- Small stat row -->
+      <div class="grid grid-3 mt-16">
+        <mat-card><mat-card-content>
+          <div class="sublbl">Trees reserved for you</div>
+          <b>{{ treesReserved() }}</b> · in {{ upcoming().length }} upcoming slot(s)
+        </mat-card-content></mat-card>
+        <mat-card><mat-card-content>
+          <div class="sublbl">Completed plantations</div>
+          <b>{{ planted().length }}</b> of {{ total() }} bookings
+        </mat-card-content></mat-card>
+        <mat-card><mat-card-content>
+          <div class="sublbl">Cancelled</div>
+          <b>{{ cancelled() }}</b>
+        </mat-card-content></mat-card>
+      </div>
+
+      <!-- Status breakdown -->
+      <h2 class="section">Booking status</h2>
+      <mat-card>
+        <mat-card-content class="chips">
+          <span *ngFor="let s of statusBreakdown()"
+                class="chip" [ngClass]="statusClass(s.status)">
+            {{ statusLabel(s.status) }} · {{ s.count }}
+          </span>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="two-col mt-16">
+        <!-- Upcoming -->
+        <mat-card>
+          <mat-card-header><mat-card-title>Upcoming bookings</mat-card-title></mat-card-header>
+          <mat-card-content>
+            <div class="row-item" *ngFor="let b of upcoming()">
+              <div>
+                <b>{{ b.parkName || 'Park' }}</b>
+                <div class="muted">
+                  {{ b.bookingRef }} · {{ b.slotDate | date:'mediumDate' }}
+                  <span *ngIf="b.slotTime"> · {{ b.slotTime }}</span>
+                  · {{ treeCount(b) }} tree(s)
+                </div>
+              </div>
+              <div class="right">
+                <span class="pill" [ngClass]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+                <a mat-button routerLink="/citizen/bookings/{{ b.bookingId }}">View</a>
+              </div>
+            </div>
+            <p *ngIf="upcoming().length === 0" class="muted">
+              Nothing scheduled right now.
+              <a routerLink="/citizen/book">Book a slot →</a>
+            </p>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Recent -->
+        <mat-card>
+          <mat-card-header><mat-card-title>Recent bookings</mat-card-title></mat-card-header>
+          <mat-card-content>
+            <div class="row-item" *ngFor="let b of recent()">
+              <div>
+                <b>{{ b.parkName || 'Park' }}</b>
+                <div class="muted">
+                  {{ b.bookingRef }} · booked {{ b.bookedAt | date:'mediumDate' }}
+                  · {{ treeCount(b) }} tree(s)
+                </div>
+              </div>
+              <div class="right">
+                <span class="pill" [ngClass]="statusClass(b.status)">{{ statusLabel(b.status) }}</span>
+                <a mat-button routerLink="/citizen/bookings/{{ b.bookingId }}">Open</a>
+              </div>
+            </div>
+            <p *ngIf="recent().length === 0" class="muted">No bookings yet.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

@@ -1,0 +1,12 @@
+.head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; }
+.toolbar mat-form-field { min-width: 220px; }
+.form-card { margin-top: 8px; }
+.form { padding-top: 8px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row mat-form-field { flex: 1; min-width: 150px; }
+.muted { color: rgba(0,0,0,.5); padding: 16px; }
+.pill { background: #e8f5e9; color: #2e7d32; padding: 3px 10px; border-radius: 12px; font-size: .72rem; font-weight: 600; }
+.pill.warn { background: #fff3e0; color: #e65100; }
+.trees-btn { font-size: .78rem; line-height: 1.6; padding: 0 10px; white-space: nowrap; }
+.trees-btn mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }

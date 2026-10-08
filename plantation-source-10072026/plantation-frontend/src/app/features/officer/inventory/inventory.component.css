@@ -1,0 +1,4 @@
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; }
+.toolbar mat-form-field { min-width: 220px; }
+.scroll { overflow-x: auto; }
+.muted { color: rgba(0,0,0,.5); font-size: .82rem; padding: 8px 0; }

@@ -1,0 +1,35 @@
+<div class="page">
+  <h1 class="page-title">Parks</h1>
+  <p class="page-sub">Choose a park to book your plantation slot</p>
+
+  <mat-form-field appearance="outline" class="filter">
+    <mat-label>Filter by zone</mat-label>
+    <mat-select [(ngModel)]="selectedZone" (selectionChange)="onZoneChange()">
+      <mat-option value="">All zones</mat-option>
+      <mat-option *ngFor="let z of zones()" [value]="z.zoneId">{{ z.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="grid grid-3">
+    <mat-card *ngFor="let p of parks()" class="park" [routerLink]="['/parks', p.parkId]">
+      <mat-card-content>
+        <div class="head">
+          <h3>{{ p.name }}</h3>
+          <span class="badge" *ngIf="p.zone">{{ p.zone.name }}</span>
+        </div>
+        <p class="muted">{{ p.address || p.city || 'Delhi' }}</p>
+        <div class="stats" *ngIf="p.totalSlots != null">
+          <span>🎫 {{ p.totalSlots }} slots</span>
+          <span>✅ {{ p.bookedSlots }} booked</span>
+          <span>🟢 {{ p.freeSlots }} free</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p *ngIf="loading()" class="muted">Loading…</p>
+  <p *ngIf="!loading() && parks().length === 0" class="muted">No parks found.</p>
+
+  <mat-paginator [length]="total()" [pageSize]="pageSize" [pageIndex]="pageIndex"
+                 (page)="onPage($event)" showFirstLastButtons></mat-paginator>
+</div>

@@ -1,0 +1,4 @@
+.assign-box mat-card-content, .assign-box { padding: 16px; }
+.assign-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.assign-row mat-form-field { flex: 1; min-width: 220px; }
+.muted { color: rgba(0,0,0,.5); padding: 16px; }

@@ -1,0 +1,97 @@
+<div class="page" *ngIf="booking() as b">
+  <div class="head">
+    <div>
+      <h1 class="page-title">Booking {{ b.bookingRef }}</h1>
+      <p class="page-sub">Booked {{ b.bookedAt | date:'medium' }}</p>
+    </div>
+    <a mat-stroked-button routerLink="/citizen/bookings">← Back</a>
+  </div>
+
+  <div class="grid grid-2">
+    <mat-card>
+      <mat-card-header><mat-card-title>Visit details</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <dl>
+          <dt>Park</dt><dd>{{ b.parkName }}</dd>
+          <dt>Date</dt><dd>{{ b.slotDate }}</dd>
+          <dt>Time</dt><dd>{{ b.slotTime }}</dd>
+          <dt>Status</dt>
+          <dd><span class="pill">{{ b.status.replace('_', ' ') }}</span></dd>
+          <dt *ngIf="b.occasionName">Occasion</dt>
+          <dd *ngIf="b.occasionName">{{ b.occasionEmoji }} {{ b.occasionName }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Payment</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngIf="b.paymentOrder as o">
+            <span matListItemTitle>Trees subtotal</span>
+            <span matListItemLine>{{ o.amount | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item *ngIf="b.paymentOrder as o">
+            <span matListItemTitle>GST</span>
+            <span matListItemLine>{{ o.gstAmount | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item *ngIf="b.paymentOrder as o">
+            <span matListItemTitle>Processing fee</span>
+            <span matListItemLine>{{ o.feeAmount | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item *ngIf="b.paymentOrder as o">
+            <span matListItemTitle>Total payable</span>
+            <span matListItemLine>{{ o.totalAmount | currency:'INR':'symbol' }}</span>
+          </mat-list-item>
+          <mat-list-item *ngIf="!b.paymentOrder">
+            <span matListItemTitle>{{ b.amountPaid != null ? '₹' + b.amountPaid : '—' }}</span>
+            <span matListItemLine>Amount</span>
+          </mat-list-item>
+        </mat-list>
+        <dl>
+          <dt>Status</dt><dd>{{ b.status === 'PENDING_PAYMENT' ? 'Pending' : 'Settled' }}</dd>
+        </dl>
+        <button mat-flat-button color="primary" *ngIf="b.status === 'PENDING_PAYMENT'"
+                (click)="pay()" [disabled]="busy()">
+          {{ busy() ? 'Redirecting…' : 'Pay now' }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="mt-16">
+    <mat-card-header><mat-card-title>Trees booked</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <div class="tree" *ngFor="let it of b.items">
+        <span class="emoji">{{ it.treeEmoji }}</span>
+        <div class="info">
+          <b>{{ it.treeName }}</b>
+          <div class="muted">{{ it.quantity }} × ₹{{ it.unitPrice }}</div>
+        </div>
+        <b class="total">₹{{ it.totalPrice }}</b>
+      </div>
+      <p *ngIf="!b.items?.length" class="muted">No items.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mt-16">
+    <mat-card-header><mat-card-title>Presence mode</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <p class="muted">Will you attend personally or send someone on your behalf?</p>
+      <mat-button-toggle-group [value]="b.presenceMode" (change)="setPresence($event.value)">
+        <mat-button-toggle value="PHYSICAL">I will attend</mat-button-toggle>
+        <mat-button-toggle value="DELEGATED">Send a delegate</mat-button-toggle>
+      </mat-button-toggle-group>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="actions">
+    <button mat-stroked-button color="warn" *ngIf="['PENDING_PAYMENT','PAID','SCHEDULED','WAITING'].includes(b.status)"
+            (click)="cancel()">Cancel booking</button>
+    <a mat-flat-button color="primary" *ngIf="['PLANTED','COMPLETED'].includes(b.status)"
+       routerLink="/citizen/certificates">View certificate</a>
+  </div>
+</div>
+
+<p *ngIf="loading()" class="page muted">Loading…</p>
+<p *ngIf="!loading() && !booking()" class="page muted">Booking not found.</p>

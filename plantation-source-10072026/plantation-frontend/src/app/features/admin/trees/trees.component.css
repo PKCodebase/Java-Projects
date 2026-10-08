@@ -1,0 +1,10 @@
+.head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.form-card { margin-bottom: 8px; }
+.form { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row mat-form-field { flex: 1; min-width: 160px; }
+.emoji { font-size: 1.5rem; }
+.muted { color: rgba(0,0,0,.5); padding: 16px; }
+.muted2 { color: rgba(0,0,0,.45); font-size: .78rem; font-style: italic; }
+.status-pill { background: #eee; color: #666; padding: 3px 10px; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+.status-pill.on { background: #e8f5e9; color: #2e7d32; }

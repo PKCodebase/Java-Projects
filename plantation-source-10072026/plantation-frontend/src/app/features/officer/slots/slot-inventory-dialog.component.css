@@ -1,0 +1,33 @@
+.ctx { color: rgba(0, 0, 0, .6); font-size: .85rem; margin: 0 0 12px; }
+.muted { color: rgba(0, 0, 0, .55); font-size: .9rem; }
+.hint { color: rgba(0, 0, 0, .5); font-size: .78rem; margin: 8px 0 0; max-width: 460px; }
+
+.inv { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.inv th {
+  text-align: left; font-weight: 600; color: rgba(0, 0, 0, .55);
+  padding: 6px 8px; border-bottom: 1px solid rgba(0, 0, 0, .12);
+  text-transform: uppercase; font-size: .7rem; letter-spacing: .04em;
+}
+.inv td { padding: 8px; border-bottom: 1px solid rgba(0, 0, 0, .07); }
+.inv .right { text-align: right; }
+.inv .actions { white-space: nowrap; }
+
+.pill {
+  display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .68rem;
+  font-weight: 600; letter-spacing: .03em; background: #e3f2e6; color: #1b5e20;
+}
+.pill.warn { background: #fdecea; color: #b3261e; }
+
+.qty {
+  width: 74px; padding: 6px 8px; border: 1px solid rgba(0, 0, 0, .25);
+  border-radius: 6px; font: inherit;
+}
+.mat-icon.armed { color: #b3261e; }
+
+.add-form {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin-top: 16px; padding-top: 12px; border-top: 1px dashed rgba(0, 0, 0, .15);
+}
+.add-form mat-form-field:first-child { flex: 1; }
+.add-form .qty-field { width: 130px; }
+.add-form button { margin-top: 4px; }

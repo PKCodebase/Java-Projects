@@ -1,0 +1,13 @@
+.cert { border-top: 4px solid #2e7d32; }
+.cert.invalid { border-top-color: #c62828; }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.emoji { font-size: 2rem; }
+.badge { font-size: .7rem; font-weight: 700; padding: 3px 8px; border-radius: 8px; }
+.badge.ok { background: #e8f5e9; color: #2e7d32; }
+.badge.bad { background: #ffebee; color: #c62828; }
+.cert h3 { margin: 10px 0 8px; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: .85rem; }
+dt { color: rgba(0,0,0,.5); }
+dd { margin: 0; font-weight: 500; }
+.row { display: flex; gap: 8px; margin-top: 12px; }
+.muted { color: rgba(0,0,0,.55); padding: 8px 0; }

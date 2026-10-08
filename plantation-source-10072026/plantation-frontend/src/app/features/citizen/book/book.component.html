@@ -1,0 +1,432 @@
+<div class="page">
+  <mat-toolbar color="primary" class="mb-16">
+    <mat-icon>park</mat-icon>
+    <span>Book a plantation slot</span>
+    <span class="toolbar-spacer"></span>
+    <a mat-button routerLink="/citizen/bookings">
+      <mat-icon>arrow_back</mat-icon> Back
+    </a>
+  </mat-toolbar>
+  <p class="page-sub">Reserve your spot in 6 easy steps — occasion, park, date &amp; slot, tree, confirm, payment.</p>
+
+  <mat-stepper linear #stepper>
+
+    <!-- ═══ 1 · OCCASION ═══════════════════════════════════════════ -->
+    <mat-step [completed]="true" label="1 · OCCASION">
+      <mat-card appearance="outlined" class="mb-16">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          Select the occasion for your plantation, and we&rsquo;ll recommend
+          suitable tree species. You may also skip this step if you prefer.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-progress-bar *ngIf="loadingMasters()" mode="indeterminate"></mat-progress-bar>
+
+      <div *ngIf="!loadingMasters()" class="grid grid-3">
+        <mat-card *ngFor="let o of occasions()" (click)="selectOccasion(o)">
+          <mat-card-header>
+            <div mat-card-avatar>{{ o.emojiCode }}</div>
+            <mat-card-title>{{ o.name }}</mat-card-title>
+            <mat-card-subtitle>{{ o.description || 'Plant in honour of this occasion' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" disabled
+                    *ngIf="occasion()?.occasionId === o.occasionId">
+              <mat-icon>check_circle</mat-icon> Selected
+            </button>
+            <button mat-stroked-button *ngIf="occasion()?.occasionId !== o.occasionId"
+                    (click)="selectOccasion(o)">
+              Select
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <mat-card (click)="selectOccasion(null)">
+          <mat-card-header>
+            <div mat-card-avatar>🌱</div>
+            <mat-card-title>Any occasion</mat-card-title>
+            <mat-card-subtitle>Skip this and plant whenever suits you</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" disabled *ngIf="!occasion()">
+              <mat-icon>check_circle</mat-icon> Selected
+            </button>
+            <button mat-stroked-button *ngIf="occasion()" (click)="selectOccasion(null)">
+              Skip occasion
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <mat-card *ngIf="!loadingMasters() && occasions().length === 0" appearance="outlined">
+        <mat-card-content>
+          <mat-icon>info</mat-icon> No occasions are configured — continue to pick a park.
+        </mat-card-content>
+      </mat-card>
+
+      <button mat-flat-button color="primary" matStepperNext>Continue to park</button>
+    </mat-step>
+
+    <!-- ═══ 2 · PARK ═══════════════════════════════════════════════ -->
+    <mat-step [completed]="!!park()" label="2 · PARK">
+      <mat-card appearance="outlined" class="mb-16">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          Each park has its own available slots and tree inventory. Availability
+          may vary depending on the selected date and time slot.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Search parks</mat-label>
+        <input matInput [ngModel]="parkQuery()" (ngModelChange)="parkQuery.set($event)"
+               placeholder="Search by park name...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-chip-listbox class="mb-16">
+        <mat-chip-option (click)="zoneFilter.set('')"
+                         [selected]="zoneFilter() === ''">All zones</mat-chip-option>
+        <mat-chip-option *ngFor="let z of zones()"
+                         [selected]="zoneFilter() === z.zoneId"
+                         (click)="zoneFilter.set(z.zoneId)">{{ z.name }}</mat-chip-option>
+      </mat-chip-listbox>
+
+      <mat-chip-set class="mb-16">
+        <mat-chip highlighted>{{ filteredParks().length }} parks</mat-chip>
+        <mat-chip *ngIf="park() as p">
+          <mat-icon>check_circle</mat-icon> {{ p.name }}
+        </mat-chip>
+      </mat-chip-set>
+
+      <div class="grid grid-3">
+        <mat-card *ngFor="let p of filteredParks()" (click)="selectPark(p)">
+          <mat-card-header>
+            <div mat-card-avatar>🌳</div>
+            <mat-card-title>{{ p.name }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ p.zone?.name || 'Zone' }}<ng-container *ngIf="p.address"> · {{ p.address }}</ng-container>
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip highlighted *ngIf="p.freeSlots !== undefined">
+                {{ p.freeSlots }} slots free
+              </mat-chip>
+              <mat-chip *ngIf="p.city">{{ p.city }}</mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" disabled
+                    *ngIf="park()?.parkId === p.parkId">
+              <mat-icon>check_circle</mat-icon> Selected
+            </button>
+            <button mat-stroked-button *ngIf="park()?.parkId !== p.parkId"
+                    (click)="selectPark(p)">
+              Select
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <mat-card *ngIf="filteredParks().length === 0" appearance="outlined">
+        <mat-card-content>
+          <mat-icon>search_off</mat-icon> No parks match &ldquo;{{ parkQuery() }}&rdquo;.
+        </mat-card-content>
+      </mat-card>
+
+      <button mat-flat-button color="primary" [disabled]="!park()" matStepperNext>
+        Continue to date &amp; slot
+      </button>
+      <button mat-button matStepperPrevious>Back</button>
+    </mat-step>
+
+    <!-- ═══ 3 · DATE & SLOT ════════════════════════════════════════ -->
+    <mat-step [completed]="!!slot()" label="3 · DATE & SLOT">
+      <mat-card appearance="outlined" class="mb-16">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          The availability of trees varies by slot. Please select a slot to
+          view its tree inventory.
+        </mat-card-content>
+      </mat-card>
+
+      <div class="grid grid-2">
+        <!-- left: date + slots -->
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>Select date</mat-label>
+            <input matInput [matDatepicker]="picker" [min]="today"
+                   [ngModel]="date()" (ngModelChange)="onDate($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-progress-bar *ngIf="loadingSlots()" mode="indeterminate"></mat-progress-bar>
+
+          <mat-selection-list [multiple]="false" (selectionChange)="onSlot($event)">
+            <div mat-subheader>
+              Available slots<ng-container *ngIf="park() as p"> — {{ p.name }}</ng-container>
+            </div>
+
+            <mat-list-option *ngFor="let s of slots()" [value]="s"
+                             [selected]="slot()?.slotId === s.slotId"
+                             [disabled]="!bookable(s)">
+              <span matListItemTitle>{{ s.startTime }} – {{ s.endTime }}</span>
+              <span matListItemLine>
+                {{ s.freeSpots }} of {{ s.capacity }} spots free · {{ s.status }}
+              </span>
+            </mat-list-option>
+
+            <mat-list-item *ngIf="!loadingSlots() && slots().length === 0">
+              <mat-icon matListItemIcon>event_busy</mat-icon>
+              <span matListItemTitle>No slots on this date — try another day.</span>
+            </mat-list-item>
+          </mat-selection-list>
+
+          <button mat-flat-button color="primary" [disabled]="!slot()" matStepperNext>
+            Continue to trees
+          </button>
+          <button mat-button matStepperPrevious>Back</button>
+        </div>
+
+        <!-- right: trees stocked for the picked slot -->
+        <div>
+          <mat-list>
+            <div mat-subheader>Pick a slot to see trees</div>
+
+            <mat-list-item *ngIf="!slot()">
+              <mat-icon matListItemIcon>eco</mat-icon>
+              <span matListItemTitle>Select a time slot to see available tree species</span>
+            </mat-list-item>
+
+            <ng-container *ngIf="slot() as s">
+              <mat-list-item *ngFor="let it of s.inventory">
+                <span matListItemIcon>{{ it.emojiCode || '🌳' }}</span>
+                <span matListItemTitle>{{ it.commonName }} · ₹{{ it.price }}</span>
+                <span matListItemLine>
+                  {{ it.scientificName || it.category }} · {{ it.availableQty }} available
+                </span>
+              </mat-list-item>
+
+              <mat-list-item *ngIf="(s.inventory?.length ?? 0) === 0">
+                <mat-icon matListItemIcon>forest</mat-icon>
+                <span matListItemTitle>No trees are stocked in this slot yet.</span>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ═══ 4 · TREE ═══════════════════════════════════════════════ -->
+    <mat-step [completed]="totalItems() > 0" label="4 · TREE">
+      <mat-card appearance="outlined" class="mb-16"
+                *ngIf="recommendationHint() as o">
+        <mat-card-content>
+          <mat-icon>auto_awesome</mat-icon>
+          Trees marked &ldquo;Recommended&rdquo; suit your {{ o.emojiCode }}
+          {{ o.name }} occasion — you can still pick any tree stocked for this slot.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="mb-16"
+                *ngIf="recommendationMiss() as o">
+        <mat-card-content>
+          <mat-icon>filter_alt_off</mat-icon>
+          The trees usually recommended for {{ o.emojiCode }} {{ o.name }} are
+          not stocked in this slot — pick any tree below instead.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card *ngIf="!slot()" appearance="outlined" class="mb-16">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          Pick a date and a slot first — the trees listed there are the ones
+          stocked for that slot.
+        </mat-card-content>
+      </mat-card>
+
+      <ng-container *ngIf="slot() as s">
+        <mat-card class="mb-16">
+          <mat-card-header>
+            <mat-card-title>{{ s.startTime }} – {{ s.endTime }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ s.slotDate }} · {{ s.freeSpots }} spot(s) still free
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip *ngIf="occasion() as o">{{ o.emojiCode }} {{ o.name }}</mat-chip>
+              <mat-chip highlighted>{{ s.inventory?.length ?? 0 }} tree species stocked</mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="grid grid-3">
+          <mat-card *ngFor="let it of s.inventory">
+            <mat-card-header>
+              <div mat-card-avatar>{{ it.emojiCode || '🌳' }}</div>
+              <mat-card-title>{{ it.commonName }}</mat-card-title>
+              <mat-card-subtitle>{{ it.scientificName || it.category }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-chip-set>
+                <mat-chip highlighted *ngIf="isRecommended(it.speciesId)">
+                  ⭐ Recommended
+                </mat-chip>
+                <mat-chip>₹{{ it.price }}</mat-chip>
+                <mat-chip>{{ it.availableQty }} available</mat-chip>
+              </mat-chip-set>
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <button mat-icon-button (click)="dec(it)" [disabled]="count(it.speciesId) === 0"
+                      aria-label="Remove one">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span>{{ count(it.speciesId) }}</span>
+              <button mat-icon-button (click)="inc(it)"
+                      [disabled]="count(it.speciesId) >= it.availableQty"
+                      aria-label="Add one">
+                <mat-icon>add</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <mat-card *ngIf="(s.inventory?.length ?? 0) === 0" appearance="outlined">
+          <mat-card-content>
+            <mat-icon>forest</mat-icon> No trees are stocked in this slot yet.
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
+      <mat-chip-set class="mt-16">
+        <mat-chip highlighted>{{ totalItems() }} tree(s) selected · ₹{{ subtotal() }}</mat-chip>
+      </mat-chip-set>
+
+      <button mat-flat-button color="primary" [disabled]="totalItems() === 0" matStepperNext>
+        Continue to confirm
+      </button>
+      <button mat-button matStepperPrevious>Back</button>
+    </mat-step>
+
+    <!-- ═══ 5 · CONFIRM ════════════════════════════════════════════ -->
+    <mat-step [completed]="!!booking()" label="5 · CONFIRM">
+      <mat-card class="mb-16">
+        <mat-card-header>
+          <mat-card-title>Plantation summary</mat-card-title>
+          <mat-card-subtitle *ngIf="occasion() as o">{{ o.emojiCode }} {{ o.name }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngIf="park() as p">
+              <mat-icon matListItemIcon>park</mat-icon>
+              <span matListItemTitle>{{ p.name }}</span>
+              <span matListItemLine>{{ p.zone?.name || 'Park' }}</span>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon matListItemIcon>calendar_today</mat-icon>
+              <span matListItemTitle>{{ date() | date:'fullDate' }}</span>
+              <span matListItemLine>Visit date</span>
+            </mat-list-item>
+            <mat-list-item *ngIf="slot() as s">
+              <mat-icon matListItemIcon>schedule</mat-icon>
+              <span matListItemTitle>{{ s.startTime }} – {{ s.endTime }}</span>
+              <span matListItemLine>Slot at {{ s.parkName || park()?.name }}</span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item *ngFor="let r of selectedRows()">
+              <span matListItemIcon>{{ r.emoji }}</span>
+              <span matListItemTitle>{{ r.name }} × {{ r.qty }}</span>
+              <span matListItemLine>₹{{ r.lineTotal }}</span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item>
+              <mat-icon matListItemIcon>payments</mat-icon>
+              <span matListItemTitle>₹{{ subtotal() }}</span>
+              <span matListItemLine>
+                Trees subtotal — GST and the processing fee are added by the
+                server when the booking is created and are shown before you pay
+              </span>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="mb-16" *ngIf="createError()">
+        <mat-card-content>
+          <mat-icon color="warn">error</mat-icon> {{ createError() }}
+        </mat-card-content>
+      </mat-card>
+
+      <button mat-flat-button color="primary" (click)="createBooking()"
+              [disabled]="creating() || totalItems() === 0">
+        <mat-icon *ngIf="creating()">pending</mat-icon>
+        {{ booking() ? 'Continue to payment' : (creating() ? 'Creating booking…' : 'Confirm booking') }}
+      </button>
+      <button mat-button matStepperPrevious>Back</button>
+    </mat-step>
+
+    <!-- ═══ 6 · PAYMENT ════════════════════════════════════════════ -->
+    <mat-step [completed]="false" label="6 · PAYMENT">
+      <mat-card *ngIf="booking() as b" class="mb-16">
+        <mat-card-header>
+          <div mat-card-avatar>🌳</div>
+          <mat-card-title>Booking {{ b.bookingRef }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ b.parkName }} · {{ b.slotDate }}<ng-container *ngIf="b.slotTime"> · {{ b.slotTime }}</ng-container>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-chip-set>
+            <mat-chip highlighted>{{ b.status.replace('_', ' ') }}</mat-chip>
+            <mat-chip *ngIf="b.occasionName">{{ b.occasionEmoji }} {{ b.occasionName }}</mat-chip>
+            <mat-chip *ngFor="let it of b.items">{{ it.treeEmoji }} {{ it.treeName }} × {{ it.quantity }}</mat-chip>
+          </mat-chip-set>
+
+          <mat-list>
+            <mat-list-item *ngFor="let r of paymentRows()">
+              <mat-icon matListItemIcon>receipt_long</mat-icon>
+              <span matListItemTitle>{{ r.label }}</span>
+              <span matListItemLine>{{ r.amount | currency:'INR':'symbol' }}</span>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <a mat-button routerLink="/citizen/bookings">Pay later</a>
+          <button mat-flat-button color="primary" (click)="pay()" [disabled]="paying()">
+            <mat-icon>payment</mat-icon>
+            {{ paying() ? 'Opening gateway…' : 'Pay now' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="mb-16" *ngIf="payMessage()">
+        <mat-card-content>
+          <mat-icon color="warn">error</mat-icon> {{ payMessage() }}
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="mb-16" *ngIf="!booking()">
+        <mat-card-content>
+          <mat-icon>info</mat-icon> No booking has been created yet — confirm
+          your selection on the previous step first.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <mat-icon>info</mat-icon>
+          You are sent to the MCD payment gateway to pay. When it finishes you
+          land on the payment result page, and the booking status updates in
+          My Bookings.
+        </mat-card-content>
+      </mat-card>
+
+      <button mat-button matStepperPrevious>Back</button>
+    </mat-step>
+
+  </mat-stepper>
+</div>

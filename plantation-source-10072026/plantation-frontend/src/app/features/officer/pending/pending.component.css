@@ -1,0 +1,7 @@
+.filter { padding: 16px; margin-bottom: 8px; }
+.filter-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.filter-row mat-form-field { width: 170px; }
+.today-strip { background: #fff8e1; color: #f57f17; padding: 8px 14px; border-radius: 8px; font-size: .88rem; }
+.muted { color: rgba(0,0,0,.5); font-size: .78rem; }
+.tree-chip { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: .74rem; padding: 2px 8px; border-radius: 10px; margin: 2px 4px 2px 0; }
+.rec { margin-left: 8px; }

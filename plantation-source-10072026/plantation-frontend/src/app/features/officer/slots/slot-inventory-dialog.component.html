@@ -1,0 +1,96 @@
+<h2 mat-dialog-title>Trees in this slot</h2>
+
+<mat-dialog-content>
+  <p class="ctx">
+    <b>{{ slot().parkName }}</b><br />
+    {{ slot().slotDate }} · {{ slot().startTime }} – {{ slot().endTime }} ·
+    {{ treesAssigned }}/{{ slot().capacity }} trees assigned ·
+    {{ slot().bookedCount }} booked, {{ slot().freeSpots }} spot(s) free
+  </p>
+
+  <table class="inv" *ngIf="rows.length; else noTrees">
+    <thead>
+      <tr>
+        <th>Tree</th>
+        <th>Stock</th>
+        <th>Reserved</th>
+        <th>Free</th>
+        <th>Status</th>
+        <th class="right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td><b>{{ r.emojiCode }} {{ r.commonName }}</b></td>
+        <td>
+          <input *ngIf="editId === r.inventoryId" class="qty" type="number" min="0"
+                 [(ngModel)]="editQty" aria-label="Stock quantity" />
+          <span *ngIf="editId !== r.inventoryId">{{ r.stockQty }}</span>
+        </td>
+        <td>{{ r.reservedQty }}</td>
+        <td>{{ r.availableQty }}</td>
+        <td>
+          <span class="pill" [class.warn]="r.stockStatus !== 'AVAILABLE'">{{ r.stockStatus }}</span>
+        </td>
+        <td class="right actions">
+          <ng-container *ngIf="editId === r.inventoryId">
+            <button mat-stroked-button (click)="saveEdit(r)" [disabled]="busy()">Save</button>
+            <button mat-button (click)="cancelEdit()">Cancel</button>
+          </ng-container>
+          <ng-container *ngIf="editId !== r.inventoryId">
+            <button mat-icon-button (click)="startEdit(r)" title="Edit stock">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="requestRemove(r)"
+                    [title]="confirmRemoveId === r.inventoryId ? 'Click again to confirm removal' : 'Remove from slot'">
+              <mat-icon [class.armed]="confirmRemoveId === r.inventoryId">
+                {{ confirmRemoveId === r.inventoryId ? 'error_outline' : 'delete' }}
+              </mat-icon>
+            </button>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noTrees>
+    <p class="muted">
+      No trees assigned yet — citizens cannot book this slot until at least one species is added.
+    </p>
+  </ng-template>
+
+  <form [formGroup]="addForm" class="add-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Add tree species</mat-label>
+      <mat-select formControlName="speciesId">
+        <mat-option *ngFor="let s of availableSpecies" [value]="s.speciesId">
+          {{ s.emojiCode }} {{ s.commonName }} · {{ s.price | currency: 'INR' }}
+        </mat-option>
+        <mat-option *ngIf="availableSpecies.length === 0" disabled>
+          All species already on this slot
+        </mat-option>
+      </mat-select>
+      <mat-error>Required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="qty-field">
+      <mat-label>Stock qty</mat-label>
+      <input matInput type="number" formControlName="stockQty" />
+      <mat-error>Min 1</mat-error>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="add()" [disabled]="busy()">
+      <mat-icon>add</mat-icon> Add
+    </button>
+  </form>
+
+  <p class="hint">
+    Rules enforced by the backend: the species must already be allocated to this park, and the
+    total stock of the slot cannot exceed its capacity — {{ capacityLeft }} tree(s) can still be
+    assigned here.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">Done</button>
+</mat-dialog-actions>

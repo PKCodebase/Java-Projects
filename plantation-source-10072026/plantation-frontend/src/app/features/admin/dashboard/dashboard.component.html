@@ -1,0 +1,181 @@
+<div class="page">
+  <h1 class="page-title">Admin Dashboard</h1>
+  <p class="page-sub" *ngIf="data() as d">Snapshot · {{ d.generatedAt | date:'medium' }}</p>
+
+  <p *ngIf="error()" class="error">{{ error() }}</p>
+  <p *ngIf="loading()" class="muted">Loading overview…</p>
+
+  <ng-container *ngIf="data() as d">
+    <!-- Headline KPIs -->
+    <div class="grid grid-4">
+      <mat-card class="kpi green"><mat-card-content>
+        <mat-icon>park</mat-icon><div class="num">{{ d.totalTreesPlanted }}</div>
+        <div class="lbl">Trees planted</div></mat-card-content></mat-card>
+
+      <mat-card class="kpi blue"><mat-card-content>
+        <mat-icon>receipt_long</mat-icon><div class="num">{{ d.totalBookings }}</div>
+        <div class="lbl">Total bookings</div></mat-card-content></mat-card>
+
+      <mat-card class="kpi purple"><mat-card-content>
+        <mat-icon>workspace_premium</mat-icon><div class="num">{{ d.totalCertificatesIssued }}</div>
+        <div class="lbl">Certificates issued</div></mat-card-content></mat-card>
+
+      <mat-card class="kpi purple"><mat-card-content>
+        <mat-icon>forest</mat-icon><div class="num">{{ d.activeParkCount }}</div>
+        <div class="lbl">Active parks</div></mat-card-content></mat-card>
+
+      <mat-card class="kpi amber"><mat-card-content>
+        <mat-icon>event_available</mat-icon><div class="num">{{ d.upcomingSlotCount }}</div>
+        <div class="lbl">Upcoming slots (7 days)</div></mat-card-content></mat-card>
+
+      <mat-card class="kpi red"><mat-card-content>
+        <mat-icon>report</mat-icon><div class="num">{{ d.lowStockAlertCount }}</div>
+        <div class="lbl">Low stock alerts</div></mat-card-content></mat-card>
+    </div>
+
+    <!-- Today / week / month -->
+    <div class="grid grid-3 mt-16">
+      <mat-card><mat-card-content>
+        <div class="sublbl">Today</div>
+        <b>{{ d.treesPlantedToday }}</b> trees · <b>{{ d.bookingsMadeToday }}</b> bookings
+      </mat-card-content></mat-card>
+      <mat-card><mat-card-content>
+        <div class="sublbl">This week (Mon–today)</div>
+        <b>{{ d.treesPlantedThisWeek }}</b> trees · <b>{{ d.bookingsMadeThisWeek }}</b> bookings
+      </mat-card-content></mat-card>
+      <mat-card><mat-card-content>
+        <div class="sublbl">This month (1st–today)</div>
+        <b>{{ d.treesPlantedThisMonth }}</b> trees · <b>{{ d.bookingsMadeThisMonth }}</b> bookings
+      </mat-card-content></mat-card>
+    </div>
+
+    <!-- Full booking status breakdown -->
+    <h2 class="section">Booking status</h2>
+    <div class="grid grid-4">
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsPendingPayment }}</div><div class="label">Pending payment</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsPaid }}</div><div class="label">Paid</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsScheduled }}</div><div class="label">Scheduled</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsWaiting }}</div><div class="label">Waiting</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsPlanted }}</div><div class="label">Planted</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsCompleted }}</div><div class="label">Completed</div>
+      </mat-card-content></mat-card>
+      <mat-card class="stat-card"><mat-card-content>
+        <div class="value">{{ d.bookingsCancelled }}</div><div class="label">Cancelled</div>
+      </mat-card-content></mat-card>
+    </div>
+
+    <div class="two-col mt-16">
+      <!-- 7-day trend -->
+      <mat-card>
+        <mat-card-header><mat-card-title>Last 7 days</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <div class="legend">
+            <span class="key key-green"></span> planted
+            <span class="key key-blue"></span> booked
+          </div>
+          <div class="trend-row" *ngFor="let t of d.dailyTrend">
+            <span class="bar-label">{{ t.date | date:'EEE d' }}</span>
+            <div class="trend-bars">
+              <div class="trend-track">
+                <div class="trend-fill fill-green" [style.width]="barWidth(t.planted, maxTrend())"></div>
+              </div>
+              <div class="trend-track">
+                <div class="trend-fill fill-blue" [style.width]="barWidth(t.booked, maxTrend())"></div>
+              </div>
+            </div>
+            <span class="bar-val">{{ t.planted }}/{{ t.booked }}</span>
+          </div>
+          <p *ngIf="d.dailyTrend.length === 0" class="muted">No data.</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Top pending parks -->
+      <mat-card>
+        <mat-card-header><mat-card-title>Parks with pending work</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <div class="bar-row" *ngFor="let p of d.topPendingParks">
+            <span class="bar-label" [title]="p.parkName">{{ p.parkName }}</span>
+            <div class="bar-track"><div class="bar-fill amber" [style.width]="barWidth(p.pendingCount, maxPending())"></div></div>
+            <span class="bar-val">{{ p.pendingCount }}</span>
+          </div>
+          <p *ngIf="d.topPendingParks.length === 0" class="muted">No pending plantation work anywhere. 🎉</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="two-col mt-16">
+      <!-- Zone breakdown -->
+      <mat-card>
+        <mat-card-header><mat-card-title>Zone breakdown</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <div class="bar-row" *ngFor="let z of d.zoneBreakdown">
+            <span class="bar-label" [title]="z.zoneName">{{ z.zoneName }}</span>
+            <div class="bar-track"><div class="bar-fill" [style.width]="barWidth(z.totalPlanted, maxPlanted())"></div></div>
+            <span class="bar-val">{{ z.totalPlanted }}</span>
+          </div>
+          <p *ngIf="d.zoneBreakdown.length === 0" class="muted">No data.</p>
+          <table class="simple" *ngIf="d.zoneBreakdown.length > 0">
+            <thead><tr><th>Zone</th><th>Planted</th><th>Scheduled</th><th>Bookings</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let z of d.zoneBreakdown">
+                <td>{{ z.zoneName }}</td>
+                <td>{{ z.totalPlanted }}</td>
+                <td>{{ z.scheduledBookings }}</td>
+                <td>{{ z.totalBookings }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Species breakdown -->
+      <mat-card>
+        <mat-card-header><mat-card-title>Top species</mat-card-title></mat-card-header>
+        <mat-card-content>
+          <table class="simple">
+            <thead><tr><th>Species</th><th>Planted</th><th>Scheduled</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let s of d.speciesBreakdown">
+                <td>{{ s.emojiCode }} {{ s.commonName }}</td>
+                <td>{{ s.totalPlanted }}</td>
+                <td>{{ s.scheduled }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p *ngIf="d.speciesBreakdown.length === 0" class="muted">No data.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Recent activity -->
+    <h2 class="section">Recent activity</h2>
+    <mat-card>
+      <mat-card-content class="scroll">
+        <div class="activity" *ngFor="let a of d.recentActivity">
+          <mat-icon>check_circle</mat-icon>
+          <div>
+            <b>{{ a.citizenName }}</b> planted at <b>{{ a.parkName }}</b>
+            <span class="muted"> · {{ a.bookingRef }}</span>
+            <div class="muted">
+              <span *ngFor="let t of a.trees"> {{ t.treeEmoji }} {{ t.treeName }}×{{ t.quantity }}</span>
+              <span *ngIf="a.officialName"> · by {{ a.officialName }}</span>
+            </div>
+          </div>
+          <span class="date">{{ a.plantedDate }}</span>
+        </div>
+        <p *ngIf="d.recentActivity.length === 0" class="muted">No recent activity.</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

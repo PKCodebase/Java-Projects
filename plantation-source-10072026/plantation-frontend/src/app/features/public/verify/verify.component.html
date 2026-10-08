@@ -1,0 +1,40 @@
+<div class="page narrow">
+  <h1 class="page-title">Verify a Certificate</h1>
+  <p class="page-sub">Enter a certificate number to check its authenticity</p>
+
+  <mat-card>
+    <mat-card-content class="verify-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Certificate number</mat-label>
+        <input matInput [(ngModel)]="certNumber" (keyup.enter)="verify()" />
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="verify()" [disabled]="loading()">
+        {{ loading() ? 'Checking…' : 'Verify' }}
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="result() as c" class="result" [class.valid]="c.isValid" [class.invalid]="!c.isValid">
+    <mat-card-content>
+      <div class="verdict">
+        <mat-icon>{{ c.isValid ? 'verified' : 'cancel' }}</mat-icon>
+        <b>{{ c.isValid ? 'Valid certificate' : 'Invalid / revoked' }}</b>
+      </div>
+      <dl>
+        <dt>Certificate #</dt><dd>{{ c.certNumber }}</dd>
+        <dt>Citizen</dt><dd>{{ c.citizenName }}</dd>
+        <dt>Park</dt><dd>{{ c.parkName }}</dd>
+        <dt>Tree</dt><dd>{{ c.treeEmoji }} {{ c.treeName }} ({{ c.quantity }})</dd>
+        <dt>Planted</dt><dd>{{ c.plantedDate }}</dd>
+        <dt>Issued</dt><dd>{{ c.issuedAt | date:'medium' }}</dd>
+      </dl>
+      <a mat-stroked-button *ngIf="c.pdfUrl" [href]="c.pdfUrl" target="_blank">Download PDF</a>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="error()" class="result invalid">
+    <mat-card-content>
+      <div class="verdict"><mat-icon>cancel</mat-icon><b>{{ error() }}</b></div>
+    </mat-card-content>
+  </mat-card>
+</div>

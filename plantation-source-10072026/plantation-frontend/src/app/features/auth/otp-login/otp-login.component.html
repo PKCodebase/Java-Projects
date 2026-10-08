@@ -1,0 +1,40 @@
+<div class="auth-wrap">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>📱 Login with OTP</mat-card-title>
+      <mat-card-subtitle>No password needed</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Step 1 -->
+      <form *ngIf="!otpSent()" [formGroup]="mobileForm" (ngSubmit)="sendOtp()" class="step-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mobile number</mat-label>
+          <input matInput formControlName="mobileNumber" maxlength="10" />
+          <mat-error>Enter a valid 10-digit mobile</mat-error>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+          <mat-spinner *ngIf="loading()" diameter="20" class="btn-spin"></mat-spinner>
+          <span *ngIf="!loading()">Send OTP</span>
+        </button>
+      </form>
+
+      <!-- Step 2 -->
+      <form *ngIf="otpSent()" [formGroup]="otpForm" (ngSubmit)="verifyOtp()" class="step-form">
+        <p class="hint">Code sent to <b>+91 {{ mobile() }}</b></p>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>OTP</mat-label>
+          <input matInput formControlName="otp" maxlength="6" />
+          <mat-error>Enter the code</mat-error>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+          <mat-spinner *ngIf="loading()" diameter="20" class="btn-spin"></mat-spinner>
+          <span *ngIf="!loading()">Verify &amp; Sign In</span>
+        </button>
+        <button mat-button type="button" (click)="otpSent.set(false)">Change number</button>
+      </form>
+    </mat-card-content>
+    <mat-card-actions class="auth-actions">
+      <a mat-button routerLink="/login">Back to password login</a>
+    </mat-card-actions>
+  </mat-card>
+</div>

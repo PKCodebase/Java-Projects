@@ -1,0 +1,35 @@
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Grow a Greener Delhi 🌳</h1>
+    <p>Join the MCD plantation drive — book a slot, plant a tree, and get a certificate.</p>
+    <div class="cta">
+      <a mat-flat-button color="primary" routerLink="/parks">Browse Parks</a>
+      <a mat-stroked-button routerLink="/verify">Verify Certificate</a>
+    </div>
+  </div>
+</section>
+
+<section class="page">
+  <h2 class="section-title">Why join?</h2>
+  <div class="grid grid-4">
+    <mat-card *ngFor="let f of features" class="feature">
+      <mat-card-content>
+        <div class="icon"><mat-icon>{{ f.icon }}</mat-icon></div>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.text }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <h2 class="section-title mt-16">Featured parks</h2>
+  <div class="grid grid-3">
+    <mat-card *ngFor="let p of parks()" class="park" [routerLink]="['/parks', p.parkId]">
+      <mat-card-content>
+        <h3>{{ p.name }}</h3>
+        <p class="muted">{{ p.zone?.name }} · {{ p.city || 'Delhi' }}</p>
+        <p class="muted" *ngIf="p.freeSlots != null">{{ p.freeSlots }} free slots</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <p *ngIf="loading()" class="muted">Loading parks…</p>
+</section>

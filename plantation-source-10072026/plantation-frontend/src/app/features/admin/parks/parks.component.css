@@ -1,0 +1,6 @@
+.head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.filter { max-width: 300px; }
+.muted { color: rgba(0,0,0,.5); padding: 16px; }
+.pad { padding: 16px; }
+.status-pill.on { background: #e8f5e9; color: #2e7d32; }
+.status-pill { background: #eee; color: #666; }

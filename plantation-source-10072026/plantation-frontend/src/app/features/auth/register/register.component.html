@@ -1,0 +1,60 @@
+<div class="auth-wrap">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>🌱 Create your account</mat-card-title>
+      <mat-card-subtitle>Register as a citizen</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="fullName" />
+          <mat-error>Name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          <mat-error>Enter a valid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password" />
+          <button mat-icon-button matSuffix type="button" (click)="hide.set(!hide())">
+            <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.controls.password.hasError('required')">Password is required</mat-error>
+          <mat-error *ngIf="form.controls.password.hasError('minlength')">Min 8 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mobile (10 digits)</mat-label>
+          <input matInput formControlName="phone" maxlength="10" />
+          <mat-error>Enter a valid Indian mobile number</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Aadhaar last 4 (optional)</mat-label>
+          <input matInput formControlName="aadhaarLast4" maxlength="4" />
+          <mat-error>Digits only</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address (optional)</mat-label>
+          <textarea matInput rows="2" formControlName="address"></textarea>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="full-width btn-lg"
+                type="submit" [disabled]="loading()">
+          <mat-spinner *ngIf="loading()" diameter="20" class="btn-spin"></mat-spinner>
+          <span *ngIf="!loading()">Register</span>
+        </button>
+      </form>
+    </mat-card-content>
+    <mat-card-actions class="auth-actions">
+      <span>Already registered?</span>
+      <a mat-button color="primary" routerLink="/login">Sign in</a>
+    </mat-card-actions>
+  </mat-card>
+</div>
