@@ -4,15 +4,15 @@ spring:
     name: configdemo
 
   config:
-    import: "configserver:http://localhost:9090"
+    import: "optional:configserver:http://localhost:9090"
 
   profiles:
-    active: dev
+    active: prod
 
-build:
-  id: ${ID}
-  version: ${VERSION}
-  name: ${NAME}
+#build:
+#  id: ${ID}
+#  version: ${VERSION}
+#  name: ${NAME}
 
 management:
   endpoints:

@@ -1,0 +1,22 @@
+#
+#spring:
+#  application:
+#    name: configdemo
+
+#  config:
+#    import: "optional:configserver:http://localhost:9090"
+#
+#  profiles:
+#    active: prod
+
+build:
+  id: 10111
+  version: 1.2.3.4.5
+  name: "Native default-Production Build"
+  type: "Native  default Production Build"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
