@@ -9,10 +9,10 @@ spring:
   profiles:
     active: prod
 
-#build:
-#  id: ${ID}
-#  version: ${VERSION}
-#  name: ${NAME}
+build:
+  id: ${ID}
+  version: ${VERSION}
+  name: ${NAME}
 
 management:
   endpoints:

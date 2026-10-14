@@ -5,6 +5,18 @@ spring:
   profiles:
     active: native
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "*"
+
   # datasource:
   #   url: jdbc:mysql://localhost:3306/configdb
   #   username: ${USERNAME}
@@ -26,3 +38,5 @@ encrypt:
     location: classpath:config-server.jks
     password: mypass
     alias: config-server-key
+
+
